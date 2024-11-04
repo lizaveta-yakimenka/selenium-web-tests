@@ -49,11 +49,26 @@ try:
 
     print("Navigation link test passed successfully to Projects!")
   except NoSuchElementException:
-    print("Error: Home link not found")
+    print("Error: Projects link not found")
   except TimeoutException:
     print("Error: Timeout waiting for Home link")
   except AssertionError:
-    print("Error: Home link did not navigate to the expected URL")
+    print("Error: Projects link did not navigate to the expected URL")
+  #Test Header value Social
+  try:
+    home_link = driver.find_element(By.LINK_TEXT, 'Social')
+    home_link.click()
+
+    WebDriverWait(driver, 10).until(EC.url_contains('#social'))
+    assert "Social" in driver.title or driver.current_url == 'https://lyakimenka.com/#social'
+
+    print("Navigation link test passed successfully to Social!")
+  except NoSuchElementException:
+    print("Error: Social link not found")
+  except TimeoutException:
+    print("Error: Timeout waiting for Home link")
+  except AssertionError:
+    print("Error: Social link did not navigate to the expected URL")
     
 except Exception as e:
   print(f"An unexpected error occurred: {e}")
