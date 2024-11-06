@@ -4,6 +4,9 @@ from selenium.common.exceptions import NoSuchElementException, TimeoutException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.chrome.service import Service
+import time
 
 options = Options()
 options.add_argument('--no-sandbox')
@@ -70,5 +73,43 @@ try:
   except AssertionError:
     print("Error: Social link did not navigate to the expected URL")
     
+  #Test Card element
+  cards = driver.find_elements(By.CLASS_NAME, "card")
+  actions = ActionChains(driver)
+  try:
+    for card in cards:
+      actions.move_to_element(card).perform()
+      learn_more_button = WebDriverWait(card, 10).until(
+       EC.visibility_of_element_located((By.CLASS_NAME, "button")))
+      WebDriverWait(driver, 10).until(
+        EC.element_to_be_clickable(learn_more_button))
+      card_title = card.find_element(By.CLASS_NAME, 'card-title').text
+      print(f"Attempting to click 'Learn More' on card '{card_title}'")
+      learn_more_button.click()
+      time.sleep(2)
+      #Since "Learn More" is leading to a new tab, we need to handle switching tabs
+      current_window_handle = driver.current_window_handle
+      all_window_handles = driver.window_handles
+      new_window_handle = [handle for handle in all_window_handles if handle != current_window_handle][0]
+      driver.switch_to.window(new_window_handle)
+      current_url = driver.current_url
+      
+      print(f"Card with title '{card_title}' leads to: {current_url}")
+      assert current_url.startswith("http"), f"Invalid URL: {current_url}"
+      driver.close()
+      driver.switch_to.window(current_window_handle)
+      time.sleep(2)
+  except(NoSuchElementException) as e:
+    try:
+      card_title = card.find_element(By.CLASS_NAME, "card-title").text
+    except NoSuchElementException:
+      card_title = "Unknown"
+    except TimeoutException as e:
+      print(f"Timeout while waiting for 'Learn More' button on card '{card_title}': {e}")
+    
 except Exception as e:
   print(f"An unexpected error occurred: {e}")
+
+finally:
+  html = driver.page_source
+  driver.quit()
