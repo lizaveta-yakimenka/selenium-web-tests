@@ -60,6 +60,9 @@ try:
   phone_field = wait.until(EC.visibility_of_element_located((By.NAME, "phone")))
   #Send test data to the input field
   phone_field.send_keys('12345678900')
+  #Find and click the button that says Book
+  submit_button = driver.find_element(By.XPATH, "//button[text()='Book']")
+  submit_button.click()
   #This is here to just confirm everything has been found 
   print('Sent!')
 except Exception as e:
