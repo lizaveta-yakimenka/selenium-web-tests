@@ -29,8 +29,20 @@ try:
   )
   book_button.click()
   print('Clicked!')
-  #Wait for the hidden elements to appear, then make sure firstname is visible
+  #Wait for the hidden elements to appear
   wait = WebDriverWait(driver, 10)
+  #Wait until calendar element is visible
+  calendar_dates = wait.until(
+      EC.presence_of_all_elements_located((By.CLASS_NAME, "rbc-date-cell"))
+  )
+  start_date = calendar_dates[3].find_element(By.CLASS_NAME, "rbc-button-link")
+  end_date = calendar_dates[4].find_element(By.CLASS_NAME, "rbc-button-link")
+  #Perform action chain to press and drag to select dates
+  actions = ActionChains(driver)
+  actions.click_and_hold(start_date).move_to_element(end_date).release().perform()
+  #This is to confirm that action
+  print("Dates selected!")
+  #Wait to make sure firstname is visible
   firstname_field = WebDriverWait(driver, 10).until(
       EC.visibility_of_element_located((By.NAME, 'firstname'))
   )
