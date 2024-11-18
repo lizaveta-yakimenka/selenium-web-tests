@@ -24,13 +24,31 @@ try:
   driver.get('https://automationintesting.online/')
   title = driver.title
   print(f'Page title is: {title}')
-  driver.find_element(By.CLASS_NAME, 'btn').click()
-  print('Clicked!')
-  WebDriverWait(driver, 3).until(
-      EC.presence_of_element_located((By.CLASS_NAME, 'col-sm-4'))
+  book_button = WebDriverWait(driver, 10).until(
+    EC.element_to_be_clickable((By.CLASS_NAME, "openBooking"))
   )
-  print('located!')
-  driver.find_element(By.CSS_SELECTOR, "input.form-control.room-firstname[placeholder='Firstname']").send_keys("John")
+  book_button.click()
+  print('Clicked!')
+  #Wait for the hidden elements to appear, then make sure firstname is visible
+  wait = WebDriverWait(driver, 10)
+  firstname_field = WebDriverWait(driver, 10).until(
+      EC.visibility_of_element_located((By.NAME, 'firstname'))
+  )
+  #Send test data to the input field
+  firstname_field.send_keys('John')
+  #Wait until lastname is visible
+  lastname_field = wait.until(EC.visibility_of_element_located((By.NAME, "lastname")))
+  #Send test data to the input field
+  lastname_field.send_keys('Smith')
+  #Wait until email is visible
+  email_field = wait.until(EC.visibility_of_element_located((By.NAME, "email")))
+  #Send test data to the input field
+  email_field.send_keys('test123@email.com')
+  #Wait until phone is visible
+  phone_field = wait.until(EC.visibility_of_element_located((By.NAME, "phone")))
+  #Send test data to the input field
+  phone_field.send_keys('12345678900')
+  #This is here to just confirm everything has been found 
   print('Sent!')
 except Exception as e:
   print(f"An unexpected error occurred: {e}")
