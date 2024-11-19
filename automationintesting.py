@@ -31,7 +31,15 @@ def wait_and_click(by, value, description="element"):
   element.click()
   print(f"Clicked {description}.")
   return element
-
+  
+def fill_field(by, value, text, description="field"):
+  """Wait for a field to be visible and fill it with text."""
+  print(f"Waiting for {description}...")
+  field = wait.until(EC.visibility_of_element_located((by, value)))
+  field.send_keys(text)
+  print(f"Filled {description} with '{text}'.")
+  return field
+  
 try:
   #Click on Book this room button
   wait_and_click(By.CLASS_NAME, "openBooking", "Book this room")
@@ -65,28 +73,12 @@ try:
   
   #This is to confirm that action
   print("Dates selected!")
-  
-  #Wait to make sure firstname is visible
-  firstname_field = WebDriverWait(driver, 10).until(
-      EC.visibility_of_element_located((By.NAME, 'firstname'))
-  )
-  #Send test data to the input field
-  firstname_field.send_keys('John')
-  
-  #Wait until lastname is visible
-  lastname_field = wait.until(EC.visibility_of_element_located((By.NAME, "lastname")))
-  #Send test data to the input field
-  lastname_field.send_keys('Smith')
-  
-  #Wait until email is visible
-  email_field = wait.until(EC.visibility_of_element_located((By.NAME, "email")))
-  #Send test data to the input field
-  email_field.send_keys('test123@email.com')
-  
-  #Wait until phone is visible
-  phone_field = wait.until(EC.visibility_of_element_located((By.NAME, "phone")))
-  #Send test data to the input field
-  phone_field.send_keys('12345678900')
+
+  #Fill text data into the form
+  fill_field(By.NAME, 'firstname', 'John', "Firstname")
+  fill_field(By.NAME, 'lastname', 'Smith', "Lastname")
+  fill_field(By.NAME, 'email', 'test123@email.com', "Email")
+  fill_field(By.NAME, 'phone', '12345678900', "Phone")
   
   #Find and click the button that says Book
   wait_and_click(By.XPATH, "//button[text()='Book']", "Book")
