@@ -18,21 +18,39 @@ options.add_argument("--disable-extensions")
 options.add_argument("--disable-gpu") 
 options.add_argument("--disable-dev-shm-usage") 
 
-try:
-  driver = webdriver.Chrome(options=options)
+driver = webdriver.Chrome(options=options)
+driver.get('https://automationintesting.online/')
 
-  driver.get('https://automationintesting.online/')
-  title = driver.title
-  print(f'Page title is: {title}')
-  book_button = WebDriverWait(driver, 10).until(
-    EC.element_to_be_clickable((By.CLASS_NAME, "openBooking"))
+#Wait for the hidden elements to appear
+wait = WebDriverWait(driver, 10)
+
+def wait_and_click(by, value, description="element"):
+  """Wait for an element to be clickable and click it."""
+  print(f"Waiting for {description} to be clickable...")
+  element = wait.until(EC.element_to_be_clickable((by, value)))
+  element.click()
+  print(f"Clicked {description}.")
+  return element
+
+try:
+  #Click on Book this room button
+  wait_and_click(By.CLASS_NAME, "openBooking", "Book this room")
+  
+  #Test Next, Back, Today buttons on the calendar
+  toolbar_label = wait.until(
+    EC.visibility_of_element_located((By.CLASS_NAME, "rbc-toolbar-label"))
   )
+  print(f"Initial Calendar Month and Year: {toolbar_label.text}")
+
+  wait_and_click(By.XPATH, "//button[text()='Today']", "Today button")
+  print(f"Calendar Month and Year: {toolbar_label.text}")
+
+  wait_and_click(By.XPATH, "//button[text()='Next']", "Next button")
+  print(f"Calendar Month and Year: {toolbar_label.text}")
+
+  wait_and_click(By.XPATH, "//button[text()='Back']", "Back button")
+  print(f"Calendar Month and Year: {toolbar_label.text}")
   
-  book_button.click()
-  print('Clicked!')
-  
-  #Wait for the hidden elements to appear
-  wait = WebDriverWait(driver, 10)
   #Wait until calendar element is visible
   calendar_dates = wait.until(
       EC.presence_of_all_elements_located((By.CLASS_NAME, "rbc-date-cell"))
@@ -71,11 +89,7 @@ try:
   phone_field.send_keys('12345678900')
   
   #Find and click the button that says Book
-  submit_button = driver.find_element(By.XPATH, "//button[text()='Book']")
-  submit_button.click()
-  
-  #This is here to just confirm everything has been found 
-  print('Sent!')
+  wait_and_click(By.XPATH, "//button[text()='Book']", "Book")
   
 except Exception as e:
   print(f"An unexpected error occurred: {e}")
